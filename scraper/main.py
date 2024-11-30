@@ -13,7 +13,7 @@ def remove_czech_accents(text):
 url = 'https://www.imago.cz'
 
 response = requests.get(url)
-response.raise_for_status()  # Check if the request was successful
+response.raise_for_status()
 
 soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -71,7 +71,7 @@ for category in categories:
 
                     product_description = product_soup.find('div', class_='product_detail')
                     if product_description:
-                        product_description = remove_czech_accents(product_description.text.replace('\n', '').replace('\r', ' '))
+                        product_description = product_description.text.replace('\n', '').replace('\r', ' ')
                     else:
                         product_description = ''
 
@@ -80,6 +80,7 @@ for category in categories:
 
                     for div in product_parameters_divs:
                         second_letter = div.text[1]
+                        print(div)
                         if second_letter == 'é':
                             parameters['length'] = div.text.split(' ')[1]
                         elif second_letter == 'í':
