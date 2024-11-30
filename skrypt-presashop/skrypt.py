@@ -28,6 +28,9 @@ def replace_czech_characters(text):
     }
     for char, unicode_char in czech_to_unicode.items():
         text = text.replace(char, unicode_char)
+    
+    text = text.replace('❌', ' x ')
+
     return text
 
 
@@ -106,12 +109,35 @@ def update_stock_quantity(stock_available_id, quantity, id):
 
 def create_product(product, category_id):
     try:
-        description_unicode = replace_czech_characters(product['description'])
+        description_fixed = escape(product['description'])
+        description_unicode = replace_czech_characters(description_fixed)
+        name_fixed = escape(product['name'])
+        name_unicode = replace_czech_characters(name_fixed)
+
+        features_fragment = ""
+        features = [
+            {"id_feature": 5, "value": f"{product['volume']}L"},
+            {"id_feature": 6, "value": f"{product['weight']}kg"},
+            {"id_feature": 7, "value": f"{product['depth']}cm"},
+            {"id_feature": 3, "value": f"{product['height']}cm"},
+            {"id_feature": 4, "value": f"{product['width']}cm"},
+        ]
+
+        for feature in features:
+            if feature['value'] and feature['value'] != "0.0cm" and feature['value'] != "0.0kg" and feature['value'] != "0.0L":
+                feature_value_id = create_feature_value(feature['id_feature'], feature['value'])
+                if feature_value_id:
+                    features_fragment += f"""
+                    <product_feature>
+                        <id>{feature['id_feature']}</id>
+                        <id_feature_value>{feature_value_id}</id_feature_value>
+                    </product_feature>"""
+
         data = f"""
         <prestashop>
           <product>
             <name>
-              <language id="1">{escape(product['name'])}</language>
+              <language id="1">{name_unicode}</language>
             </name>
             <price>{product['price']}</price>
             <weight>{product['weight']}</weight>
@@ -128,8 +154,11 @@ def create_product(product, category_id):
             <condition>new</condition>
             <description>
               <language id="1">{description_unicode}</language>
-            </description>          
+            </description>
             <associations>
+              <product_features>
+                {features_fragment}
+              </product_features>
               <categories>
                 <category>
                   <id>{category_id}</id>
@@ -139,6 +168,7 @@ def create_product(product, category_id):
           </product>
         </prestashop>
         """
+
         response = requests.post(f"{API_URL}/products", auth=auth, data=data, verify=False)
 
         if response.status_code == 201:
@@ -153,9 +183,40 @@ def create_product(product, category_id):
             for image_path in product['images']:
                 add_image_to_product(product_id, image_path)
         else:
-            print(f"błąd podczas tworzenia produktu '{product['name']}': {response.text}")
+            print(f"Błąd podczas tworzenia produktu '{product['name']}': {response.text}")
     except Exception as e:
-        print(f"wyjątek podczas tworzenia produktu '{product['name']}': {e}")
+        print(f"Wyjątek podczas tworzenia produktu '{product['name']}': {e}")
+        
+
+def create_feature_value(id_feature, value):
+    """
+    Tworzy wartość cechy w PrestaShop i zwraca jej ID.
+    """
+    try:
+        data = f"""
+        <prestashop>
+          <product_feature_value>
+            <id_feature>{id_feature}</id_feature>
+            <custom>1</custom>
+            <value>
+              <language id="1">{value}</language>
+            </value>
+          </product_feature_value>
+        </prestashop>
+        """
+        response = requests.post(f"{API_URL}/product_feature_values", auth=auth, data=data, verify=False)
+
+        if response.status_code == 201:
+            soup = BeautifulSoup(response.content, "xml")
+            return soup.find("id").text
+        else:
+            print(f"Błąd podczas tworzenia wartości cechy '{value}': {response.text}")
+            return None
+    except Exception as e:
+        print(f"Wyjątek podczas tworzenia wartości cechy '{value}': {e}")
+        return None
+
+
 
 def add_image_to_product(product_id, image_path):
     url = f"{API_URL}/images/products/{product_id}"
@@ -201,5 +262,5 @@ def process_directory(base_path, parent_id=2):
 
 if __name__ == "__main__":
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    base_path = "/media/DISK1/kategorie"
+    base_path = "/home/gum3k/imago_products"
     process_directory(base_path)
