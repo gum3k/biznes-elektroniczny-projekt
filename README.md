@@ -1,4 +1,4 @@
-# Project for the subject Electronic business
+# Project for the subject "Electronic business"
 
 Project aimsto copy internet shop using [Prestashop 1.7.8](https://github.com/PrestaShop/PrestaShop/tree/1.7.8.x) platform and scraping program. 
 
