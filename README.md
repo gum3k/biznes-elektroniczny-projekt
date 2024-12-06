@@ -20,7 +20,7 @@ The contents of the repository are divided into the following folders:
 5. **/scraper/imago-products** -> results of the scraping;
 
 ## Used Tools
-- [Prestashop 1.7.8 Docker Image](https://github.com/PrestaShop/PrestaShop/tree/1.7.8.x)
+- [Prestashop 1.7.8](https://pl.prestashop.com/versions/)
 - [Python 3.12](https://www.python.org/downloads/release/python-3120/)
 - [Selenium](https://www.selenium.dev/documentation/)
 
