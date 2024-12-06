@@ -36,6 +36,7 @@
   {/block}
   <meta name="description" content="{block name='head_seo_description'}{$page.meta.description}{/block}">
   <meta name="keywords" content="{block name='head_seo_keywords'}{$page.meta.keywords}{/block}">
+  <link rel="stylesheet" href="{$front_uri}themes/classic/assets/css/custom.css">
   {if $page.meta.robots !== 'index'}
     <meta name="robots" content="{$page.meta.robots}">
   {/if}
