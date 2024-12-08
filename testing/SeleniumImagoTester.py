@@ -2,12 +2,14 @@ from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
 import random
 
 TIMEOUT = 10
+LONG_TIMEOUT = 60
 
 class SeleniumImagoTester:
     def __init__(self, geckodriver_path: str, base_url: str):
@@ -20,6 +22,7 @@ class SeleniumImagoTester:
     def home_page(self):
         self.driver.get(self.base_url)
 
+
     def wait_for_clickable(self, locator):
         return WebDriverWait(self.driver, TIMEOUT).until(
             EC.element_to_be_clickable(locator)
@@ -28,12 +31,32 @@ class SeleniumImagoTester:
         return WebDriverWait(self.driver, TIMEOUT).until(
             EC.presence_of_element_located(locator)
         )
+    def wait_for_presence_all(self, locator):
+        return WebDriverWait(self.driver, TIMEOUT).until(
+            EC.presence_of_all_elements_located(locator)
+        )
+    def find_products(self):
+        return WebDriverWait(self.driver, TIMEOUT).until(
+            EC.presence_of_all_elements_located((By.XPATH, f"//*[contains(@class, 'js-product product') ]"))
+        )
+    def wait_for_reload(self, current_url):
+        WebDriverWait(self.driver, LONG_TIMEOUT).until(EC.url_changes(current_url))
+    def wait_for_responsive(self):
+        self.wait_for_clickable(locator=(By.XPATH, f"//a[@href='https://localhost/index.php']"))
 
+
+    def click_by_anything(self, locator):
+        element = self.wait_for_clickable(locator)
+        element.click()
+        return element
     def click_submit_button(self):
         element = self.click_by_anything(locator=(By.CSS_SELECTOR, 'button[type="submit"]'))
         return element
     def click_by_text(self, text):
         element = self.click_by_anything(locator=(By.XPATH, f"//*[text()='{text}']"))
+        return element
+    def click_by_name(self, name):
+        element = self.click_by_anything(locator=(By.NAME, name))
         return element
     def click_by_link(self, link):
         element = self.click_by_anything(locator=(By.XPATH, f"//a[@href='{link}']"))
@@ -41,19 +64,14 @@ class SeleniumImagoTester:
     def click_by_class(self, class_name):
         element = self.click_by_anything(locator=(By.CLASS_NAME, class_name))
         return element
-    def click_by_anything(self, locator):
-        element = self.wait_for_clickable(locator)
-        element.click()
-        return element
         
 
     def register(self, gender: str, first_name: str, last_name: str, email: str, password: str, birthday: str):
-        self.click_by_link("https://localhost/index.php?controller=my-account")                         # log in button
-        self.click_by_link("https://localhost/index.php?controller=authentication&create_account=1")    # register button
+        self.click_by_link("https://localhost/index.php?controller=my-account")                      
+        self.click_by_link("https://localhost/index.php?controller=authentication&create_account=1") 
 
         self.wait_for_presence(locator=(By.ID, "customer-form"))
         
-        # filling form
         if gender == "male":
             self.driver.find_element(By.ID, "field-id_gender-1").click()
         elif gender == "female":
@@ -67,7 +85,9 @@ class SeleniumImagoTester:
         self.driver.find_element(By.NAME, "psgdpr").click()
         # self.driver.find_element(By.NAME, "optin").click()
 
+        current_url = self.driver.current_url
         self.click_submit_button()
+        self.wait_for_reload(current_url)
 
 
     def choose_quantity(self, product_quantity_min=1, product_quantity_max=1):
@@ -76,45 +96,75 @@ class SeleniumImagoTester:
         stock_value = int(stock_element.get_attribute("data-stock"))
         product_quantity_max = min(product_quantity_max, stock_value)
         random_quantity = random.randint(product_quantity_min, product_quantity_max)
-        quantity_input = WebDriverWait(self.driver, TIMEOUT).until(
-            EC.presence_of_element_located((By.ID, "quantity_wanted"))
-        )
+        quantity_input = self.wait_for_presence(locator=(By.ID, "quantity_wanted"))
         self.driver.execute_script("arguments[0].value = '';", quantity_input)
         quantity_input.send_keys(str(random_quantity))
 
-    def add_product_to_cart(self, products_amount=5, category=None, product_quantity_min=1, product_quantity_max=1):
+
+    def search_product(self, product_name):
+        search_box = self.wait_for_presence(locator=(By.CSS_SELECTOR, 'input[name="s"]'))
+        search_box.clear()
+        search_box.send_keys(product_name)
+        search_box.submit()
+        self.wait_for_presence_all(locator=(By.CLASS_NAME, 'product-miniature'))
+
+
+    def get_available_products(self):
+        self.wait_for_presence_all(locator=(By.CLASS_NAME, 'thumbnail.product-thumbnail'))
+        products = self.find_products()
+        available_products = []
+        for product in products:
+            try:
+                product.find_element(By.XPATH, ".//li[contains(@class, 'product-flag out_of_stock')]")
+                continue
+            except:
+                available_products.append(product)
+        return available_products
+    
+
+    def add_product_to_cart(self, product, product_quantity_min=1, product_quantity_max=1):
+        product.click()
+        self.choose_quantity(product_quantity_min=product_quantity_min, product_quantity_max=product_quantity_max)
+        self.click_submit_button()
+        self.click_by_anything(locator=(By.XPATH, '//div[@class="cart-content"]//button[@class="btn btn-secondary" and @data-dismiss="modal"]'))
+        self.wait_for_responsive()
+    
+    
+    def random_page(self):
+        pagination = self.wait_for_presence(locator=(By.CLASS_NAME, 'page-list'))
+        pages = pagination.find_elements(By.TAG_NAME, 'a')
+        page_numbers = [int(page.text) for page in pages if page.text.isdigit()]
+        if page_numbers:
+            random_page = random.choice(page_numbers)
+            page_link = self.driver.find_element(By.XPATH, f"//a[@href and contains(text(), '{random_page}')]")
+            page_link.click()
+        self.wait_for_presence_all(locator=(By.CLASS_NAME, 'thumbnail.product-thumbnail'))
+
+    
+    def add_random_product_to_cart(self, product_quantity_min=1, product_quantity_max=1):
+        self.random_page()
+        products = self.get_available_products()
+        product = random.choice(products)
+        self.add_product_to_cart(product, product_quantity_min, product_quantity_max)
+
+
+    def add_products_to_cart(self, products_amount=5, category=None, product_quantity_min=1, product_quantity_max=1):
         self.home_page()
         if category:
             self.click_by_text(category)
-    
-        for i in range(products_amount):
-            products = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CLASS_NAME, 'thumbnail.product-thumbnail'))
-            )
 
+        for i in range(products_amount):
+            products = self.get_available_products()
             if i >= len(products):
                 break
-
             product = products[i]
-        
-            self.click_by_anything(product)
 
+            self.add_product_to_cart(product, product_quantity_min, product_quantity_max)
 
-            add_to_cart_button = self.wait_for_presence(locator=(By.CSS_SELECTOR, 'button.add-to-cart'))
-            if not add_to_cart_button.is_enabled():
-                products_amount += 1
-                self.home_page()
-                if category:
-                    self.click_by_text(category)
-                continue
-
-            self.choose_quantity(product_quantity_min=product_quantity_min, product_quantity_max=product_quantity_max)
-            self.click_submit_button()
-
-            self.click_by_anything(locator=(By.XPATH, '//div[@class="cart-content"]//button[@class="btn btn-secondary" and @data-dismiss="modal"]'))
             self.home_page()
             if category:
                 self.click_by_text(category)
+
 
     def remove_products(self, n):
         self.click_by_link("//localhost/index.php?controller=cart&action=show")
@@ -123,6 +173,83 @@ class SeleniumImagoTester:
             WebDriverWait(self.driver, TIMEOUT).until(
                 EC.invisibility_of_element(element)
             )
+
+
+    def fill_field(self, id, value):
+        element = self.driver.find_element(By.ID, id)
+        element.clear()
+        element.send_keys(value)
+
+
+    def fill_address_form(self, address):
+        try:
+            existing_address = self.driver.find_element(By.XPATH, f"//article[contains(@class, 'address-item') and input[@type='radio' and @checked]]")
+            if existing_address:
+                return
+        except NoSuchElementException:
+            pass
+        self.fill_field("field-alias", address["alias"])
+        self.fill_field("field-firstname", address["first_name"])
+        self.fill_field("field-lastname", address["last_name"])
+        self.fill_field("field-company", address["company"])
+        self.fill_field("field-vat_number", address["vat_number"])
+        self.fill_field("field-address1", address["address1"])
+        self.fill_field("field-address2", address["address2"])
+        self.fill_field("field-postcode", address["postcode"])
+        self.fill_field("field-city", address["city"])
+        country_select = Select(self.driver.find_element(By.ID, "field-id_country"))
+        country_select.select_by_visible_text(address["country"])
+        self.fill_field("field-phone", address["phone"])
+        
+        self.click_by_name("confirm-addresses")
+
+
+
+    def select_delivery(self, delivery_name):
+        delivery_options = self.wait_for_presence_all((By.CLASS_NAME, 'delivery-option'))
+
+        for option in delivery_options:
+            carrier_name_element = option.find_element(By.CLASS_NAME, 'carrier-name')
+            if carrier_name_element and carrier_name_element.text.strip() == delivery_name:
+                radio_button = option.find_element(By.XPATH, './/input[@type="radio"]')
+                if not radio_button.is_selected():
+                    radio_button.click()
+                break
+        self.click_by_name("confirmDeliveryOption")
+
+
+    def select_payment(self, payment_method_name):
+        self.wait_for_presence_all((By.CLASS_NAME, 'payment-option'))
+        payment_radio_button = self.driver.find_element(By.CSS_SELECTOR, f"input[data-module-name='{payment_method_name}']")
+        payment_radio_button.click()
+
+        terms_checkbox = self.driver.find_element(By.ID, "conditions_to_approve[terms-and-conditions]")
+        if not terms_checkbox.is_selected():
+            terms_checkbox.click()
+        current_url = self.driver.current_url
+        self.click_by_anything((By.CSS_SELECTOR, ".btn.btn-primary.center-block"))
+        self.wait_for_reload(current_url)
+
+        
+    def order(self, order_data):
+        self.click_by_link("//localhost/index.php?controller=cart&action=show")
+        self.click_by_link("https://localhost/index.php?controller=order")
+        self.fill_address_form(order_data["address"])
+        self.select_delivery(order_data["delivery"])
+        self.select_payment(order_data["payment"])
+
+
+    def check_order_status(self):
+        self.click_by_link("https://localhost/index.php?controller=my-account")
+        self.click_by_link("https://localhost/index.php?controller=history")
+        self.click_by_anything(locator=(By.XPATH, f"//a[contains(@href, 'https://localhost/index.php?controller=order-detail')]"))
+
+
+    def download_invoice(self):
+        self.click_by_link("https://localhost/index.php?controller=my-account")
+        self.click_by_link("https://localhost/index.php?controller=history")
+        self.click_by_anything(locator=(By.XPATH, f"//a[contains(@href, 'https://localhost/index.php?controller=pdf-invoice')]"))
+        
 
 
     def quit_driver(self):

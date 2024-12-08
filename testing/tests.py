@@ -1,12 +1,7 @@
-from selenium import webdriver
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import time
 from time import sleep
 from SeleniumImagoTester import SeleniumImagoTester
+from selenium.webdriver.common.action_chains import ActionChains
 
 def generate_unique_email(base_email: str) -> str:
     local_part, domain = base_email.split('@')
@@ -14,13 +9,40 @@ def generate_unique_email(base_email: str) -> str:
     unique_email = f"{local_part}{timestamp}@{domain}"
     return unique_email
 
+def slow_scroll_down(driver):
+    actions = ActionChains(driver)
+    num_scrolls = 1000
+    scroll_distance = 1
+    pause_time = 0.005
+
+    for _ in range(num_scrolls):
+        actions.scroll_by_amount(0, scroll_distance).perform()
+        time.sleep(pause_time)
+
 
 if __name__ == "__main__":
-    automation = SeleniumImagoTester(geckodriver_path='geckodriver', base_url='https://localhost/index.php')
+    tester = SeleniumImagoTester(geckodriver_path='geckodriver', base_url='https://localhost/index.php')
 
-    # testing
-    automation.home_page()
-    automation.register(
+    order_data = {
+        "address": {
+            "alias": "Homo",
+            "first_name": "Sukmy",        
+            "last_name": "Deek",         
+            "company": "Hoe Enterprises",
+            "vat_number": "420",  
+            "address1": "123 Main St", 
+            "address2": "Apt 4B",    
+            "postcode": "01-234",       
+            "city": "Utoya",            
+            "country": "Polska",        
+            "phone": "69"       
+        },
+        "delivery": "DHL",              # My carrier / InPost / DHL / Imago
+        "payment": "ps_cashondelivery"  # ps_wirepayment / ps_cashondelivery / sumuppaymentgateway
+    }
+    
+    tester.home_page()
+    tester.register(
         gender="male", 
         first_name="Karol",
         last_name="Wojtyła",
@@ -28,10 +50,15 @@ if __name__ == "__main__":
         password="12345",
         birthday="2001-09-11"
     )
-    automation.add_product_to_cart(category="Geek domácnost", products_amount=3, product_quantity_min=1, product_quantity_max=10)
-    automation.add_product_to_cart(category="Hry na hrdiny (RPG)", products_amount=2, product_quantity_min=1, product_quantity_max=10)
-    automation.remove_products(3)
+    tester.search_product("ddddd")
+    tester.get_available_products()
+    tester.add_random_product_to_cart(product_quantity_min=1, product_quantity_max=10)
+    tester.add_products_to_cart(category="Geek domácnost", products_amount=5, product_quantity_min=1, product_quantity_max=10)
+    tester.add_products_to_cart(category="Hry na hrdiny (RPG)", products_amount=5, product_quantity_min=1, product_quantity_max=10)
+    tester.remove_products(3)
+    tester.order(order_data)
+    tester.check_order_status()
+    slow_scroll_down(tester.driver)
+    tester.download_invoice()
 
-    sleep(20)
-
-    automation.quit_driver()
+    tester.quit_driver()
