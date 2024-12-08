@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 from time import sleep
-from SeleniumTester import SeleniumTester
+from SeleniumImagoTester import SeleniumImagoTester
 
 def generate_unique_email(base_email: str) -> str:
     local_part, domain = base_email.split('@')
@@ -16,12 +16,10 @@ def generate_unique_email(base_email: str) -> str:
 
 
 if __name__ == "__main__":
-    automation = SeleniumTester(geckodriver_path='geckodriver', base_url='https://localhost/index.php')
+    automation = SeleniumImagoTester(geckodriver_path='geckodriver', base_url='https://localhost/index.php')
 
     # testing
-    automation.open_website()
-    automation.click_login_button()
-    automation.click_register_button()
+    automation.home_page()
     automation.register(
         gender="male", 
         first_name="Karol",
@@ -30,7 +28,10 @@ if __name__ == "__main__":
         password="12345",
         birthday="2001-09-11"
     )
+    automation.add_product_to_cart(category="Geek domácnost", products_amount=3, product_quantity_min=1, product_quantity_max=10)
+    automation.add_product_to_cart(category="Hry na hrdiny (RPG)", products_amount=2, product_quantity_min=1, product_quantity_max=10)
+    automation.remove_products(3)
 
-    sleep(3)
+    sleep(20)
 
     automation.quit_driver()
