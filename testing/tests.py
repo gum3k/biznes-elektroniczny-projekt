@@ -21,7 +21,7 @@ def slow_scroll_down(driver):
 
 
 if __name__ == "__main__":
-    tester = SeleniumImagoTester(geckodriver_path='geckodriver', base_url='https://localhost/index.php')
+    tester = SeleniumImagoTester(driver_path='geckodriver', base_url='https://localhost/index.php')
 
     order_data = {
         "address": {

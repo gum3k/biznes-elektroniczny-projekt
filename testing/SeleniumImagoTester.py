@@ -12,11 +12,11 @@ TIMEOUT = 10
 LONG_TIMEOUT = 60
 
 class SeleniumImagoTester:
-    def __init__(self, geckodriver_path: str, base_url: str):
-        self.geckodriver_path = geckodriver_path
+    def __init__(self, driver_path: str, base_url: str):
+        self.driver_path = driver_path
         self.base_url = base_url
         self.options = Options()
-        self.service = Service(executable_path=self.geckodriver_path)
+        self.service = Service(executable_path=self.driver_path)
         self.driver = webdriver.Firefox(service=self.service, options=self.options)
     
     def home_page(self):
@@ -42,7 +42,7 @@ class SeleniumImagoTester:
     def wait_for_reload(self, current_url):
         WebDriverWait(self.driver, LONG_TIMEOUT).until(EC.url_changes(current_url))
     def wait_for_responsive(self):
-        self.wait_for_clickable(locator=(By.XPATH, f"//a[@href='https://localhost/index.php']"))
+        self.wait_for_clickable((By.XPATH, f"//a[@href='https://localhost/index.php']"))
 
 
     def click_by_anything(self, locator):
@@ -50,27 +50,30 @@ class SeleniumImagoTester:
         element.click()
         return element
     def click_submit_button(self):
-        element = self.click_by_anything(locator=(By.CSS_SELECTOR, 'button[type="submit"]'))
+        element = self.click_by_anything((By.CSS_SELECTOR, 'button[type="submit"]'))
         return element
     def click_by_text(self, text):
-        element = self.click_by_anything(locator=(By.XPATH, f"//*[text()='{text}']"))
+        element = self.click_by_anything((By.XPATH, f"//*[text()='{text}']"))
         return element
     def click_by_name(self, name):
-        element = self.click_by_anything(locator=(By.NAME, name))
+        element = self.click_by_anything((By.NAME, name))
         return element
     def click_by_link(self, link):
-        element = self.click_by_anything(locator=(By.XPATH, f"//a[@href='{link}']"))
+        element = self.click_by_anything((By.XPATH, f"//a[@href='{link}']"))
         return element
     def click_by_class(self, class_name):
-        element = self.click_by_anything(locator=(By.CLASS_NAME, class_name))
+        element = self.click_by_anything((By.CLASS_NAME, class_name))
         return element
+    def click_element(self, locator):
+        self.wait_for_presence(locator)
+        self.driver.find_element(locator[0], locator[1]).click()
         
 
     def register(self, gender: str, first_name: str, last_name: str, email: str, password: str, birthday: str):
         self.click_by_link("https://localhost/index.php?controller=my-account")                      
         self.click_by_link("https://localhost/index.php?controller=authentication&create_account=1") 
 
-        self.wait_for_presence(locator=(By.ID, "customer-form"))
+        self.wait_for_presence((By.ID, "customer-form"))
         
         if gender == "male":
             self.driver.find_element(By.ID, "field-id_gender-1").click()
@@ -81,8 +84,8 @@ class SeleniumImagoTester:
         self.driver.find_element(By.ID, "field-email").send_keys(email)
         self.driver.find_element(By.ID, "field-password").send_keys(password)
         self.driver.find_element(By.ID, "field-birthday").send_keys(birthday)
-        self.driver.find_element(By.NAME, "customer_privacy").click()
-        self.driver.find_element(By.NAME, "psgdpr").click()
+        self.click_element((By.NAME, "customer_privacy"))
+        self.click_element((By.NAME, "psgdpr"))
         # self.driver.find_element(By.NAME, "optin").click()
 
         current_url = self.driver.current_url
@@ -92,25 +95,27 @@ class SeleniumImagoTester:
 
     def choose_quantity(self, product_quantity_min=1, product_quantity_max=1):
         self.click_by_link("#product-details")
-        stock_element = self.wait_for_presence(locator=(By.XPATH, "//span[@data-stock]"))
+        stock_element = self.wait_for_presence((By.XPATH, "//span[@data-stock]"))
         stock_value = int(stock_element.get_attribute("data-stock"))
         product_quantity_max = min(product_quantity_max, stock_value)
         random_quantity = random.randint(product_quantity_min, product_quantity_max)
-        quantity_input = self.wait_for_presence(locator=(By.ID, "quantity_wanted"))
+        quantity_input = self.wait_for_presence((By.ID, "quantity_wanted"))
         self.driver.execute_script("arguments[0].value = '';", quantity_input)
         quantity_input.send_keys(str(random_quantity))
 
 
     def search_product(self, product_name):
-        search_box = self.wait_for_presence(locator=(By.CSS_SELECTOR, 'input[name="s"]'))
+        search_box = self.wait_for_presence((By.CSS_SELECTOR, 'input[name="s"]'))
         search_box.clear()
         search_box.send_keys(product_name)
+        current_url = self.driver.current_url
         search_box.submit()
-        self.wait_for_presence_all(locator=(By.CLASS_NAME, 'product-miniature'))
+        self.wait_for_reload(current_url)
+        self.wait_for_presence_all((By.CLASS_NAME, 'product-miniature'))
 
 
     def get_available_products(self):
-        self.wait_for_presence_all(locator=(By.CLASS_NAME, 'thumbnail.product-thumbnail'))
+        self.wait_for_presence_all((By.CLASS_NAME, 'thumbnail.product-thumbnail'))
         products = self.find_products()
         available_products = []
         for product in products:
@@ -126,24 +131,28 @@ class SeleniumImagoTester:
         product.click()
         self.choose_quantity(product_quantity_min=product_quantity_min, product_quantity_max=product_quantity_max)
         self.click_submit_button()
-        self.click_by_anything(locator=(By.XPATH, '//div[@class="cart-content"]//button[@class="btn btn-secondary" and @data-dismiss="modal"]'))
+        self.click_by_anything((By.XPATH, '//div[@class="cart-content"]//button[@class="btn btn-secondary" and @data-dismiss="modal"]'))
         self.wait_for_responsive()
     
     
     def random_page(self):
-        pagination = self.wait_for_presence(locator=(By.CLASS_NAME, 'page-list'))
-        pages = pagination.find_elements(By.TAG_NAME, 'a')
-        page_numbers = [int(page.text) for page in pages if page.text.isdigit()]
-        if page_numbers:
-            random_page = random.choice(page_numbers)
-            page_link = self.driver.find_element(By.XPATH, f"//a[@href and contains(text(), '{random_page}')]")
-            page_link.click()
-        self.wait_for_presence_all(locator=(By.CLASS_NAME, 'thumbnail.product-thumbnail'))
+        self.wait_for_presence_all((By.CSS_SELECTOR, 'ul.page-list a.js-search-link'))
+        page_links = self.driver.find_elements(By.CSS_SELECTOR, 'ul.page-list a.js-search-link')
+        valid_page_links = [link for link in page_links if link.text.strip().isdigit()]
+        random_link = random.choice(valid_page_links)
+        self.wait_for_clickable(random_link)
+        current_url = self.driver.current_url
+        random_link.click()
+        self.wait_for_reload(current_url)
+
 
     
     def add_random_product_to_cart(self, product_quantity_min=1, product_quantity_max=1):
+        products = []
         self.random_page()
-        products = self.get_available_products()
+        while products == []:
+            self.random_page()
+            products = self.get_available_products()
         product = random.choice(products)
         self.add_product_to_cart(product, product_quantity_min, product_quantity_max)
 
@@ -155,8 +164,9 @@ class SeleniumImagoTester:
 
         for i in range(products_amount):
             products = self.get_available_products()
-            if i >= len(products):
-                break
+            while products == [] or i >= len(products):
+                self.random_page()
+                products = self.get_available_products()
             product = products[i]
 
             self.add_product_to_cart(product, product_quantity_min, product_quantity_max)
@@ -242,15 +252,16 @@ class SeleniumImagoTester:
     def check_order_status(self):
         self.click_by_link("https://localhost/index.php?controller=my-account")
         self.click_by_link("https://localhost/index.php?controller=history")
-        self.click_by_anything(locator=(By.XPATH, f"//a[contains(@href, 'https://localhost/index.php?controller=order-detail')]"))
+        self.click_by_anything((By.XPATH, f"//a[contains(@href, 'https://localhost/index.php?controller=order-detail')]"))
 
 
     def download_invoice(self):
         self.click_by_link("https://localhost/index.php?controller=my-account")
         self.click_by_link("https://localhost/index.php?controller=history")
-        self.click_by_anything(locator=(By.XPATH, f"//a[contains(@href, 'https://localhost/index.php?controller=pdf-invoice')]"))
+        self.click_by_anything((By.XPATH, f"//a[contains(@href, 'https://localhost/index.php?controller=pdf-invoice')]"))
         
 
 
     def quit_driver(self):
+        self.driver.close()
         self.driver.quit()
