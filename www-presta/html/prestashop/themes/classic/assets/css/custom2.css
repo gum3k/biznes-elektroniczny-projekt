@@ -1,0 +1,241 @@
+#header .header-nav{
+  box-shadow: none;
+  display: none;
+}
+
+#header .header-banner {
+  box-shadow: none;
+  display: none;
+}
+
+.facet div > ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.facet > div > ul > li.facet-label {
+  display: inline-block;
+  text-align: center;
+  padding: 5px;
+}
+
+.facet a {
+  display: none;
+}
+
+#header {
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: none;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.header-top .container .row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+#header .header-top .position-static {
+  position: relative;
+}
+
+.header-top-right {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 50px;
+  flex-wrap: nowrap;
+  width: auto;
+}
+
+#wrapper {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+}
+
+#search_widget {
+  order: 1;
+  display: flex;
+  align-items: center;
+}
+
+#search_widget input[type="text"] {
+  width: 250px;
+  padding: 5px 10px 5px 30px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+}
+
+div #_desktop_logo {
+  left: -10%;
+}
+
+#wrapper .breadcrumb{
+  display: none;
+}
+
+div.col-md-6{
+  order: 2;
+  display: flex;
+  align-items: center;
+  width: 90px;
+}
+
+#_desktop_user_info {
+  order: 3;
+  display: flex;
+  align-items: center;
+  width: 90px;
+}
+
+#_desktop_user_info a {
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  transition: color 0.3s;
+  white-space: nowrap;
+}
+
+#_desktop_cart {
+  order: 4;
+  display: flex;
+  align-items: center;
+}
+
+#_desktop_cart .header {
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.3s;
+}
+
+#search_filters_brands {
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  text-align: center;
+  box-shadow: none;
+  background: #f5f5f5;
+}
+
+.links .wrapper {
+  position: relative;
+}
+
+.links .wrapper ul {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 5px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.links .wrapper:hover ul {
+  max-height: 200px;
+  opacity: 1;
+  visibility: visible;
+  padding: 10px 0;
+}
+
+.links .wrapper ul::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent transparent #ffffff transparent;
+  z-index: 1000;
+  display: none;
+}
+
+.links .wrapper:hover ul::before {
+  display: block;
+}
+
+.links .wrapper ul li {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.links .wrapper ul li a {
+  text-decoration: none;
+  color: #333;
+}
+
+.links .wrapper ul li a:hover {
+  color: #007bff;
+}
+
+.container {
+  display: flex;
+  width: 1230px;
+}
+
+#left-column {
+  width: 25%;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+}
+
+.block-categories .h6 {
+  display:none
+}
+
+#content-wrapper {
+  width: 75%;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+}
+
+body {
+  background-image: url('tapeta.png');
+  background-repeat: repeat;
+  background-size: contain;
+  background-position: center center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  margin: 0;
+}
+
+footer {
+  max-width: 1200px;
+  background: #fff;
+  margin-left: 327px;
+}
+
