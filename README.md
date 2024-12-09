@@ -18,6 +18,7 @@ The contents of the repository are divided into the following folders:
 3. **/tests** -> source code for automated tests;
 4. **/scraper** -> source code for the scraping tool;
 5. **/scraper/imago-products** -> results of the scraping;
+6. **/presta-backup** -> backup of shop's settings;
 
 ## Used Tools
 - [Prestashop 1.7.8](https://pl.prestashop.com/versions/)
