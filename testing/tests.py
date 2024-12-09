@@ -41,6 +41,7 @@ if __name__ == "__main__":
         "payment": "ps_cashondelivery"  # ps_wirepayment / ps_cashondelivery / sumuppaymentgateway
     }
     
+    tester.driver.maximize_window()
     tester.home_page()
     tester.register(
         gender="male", 

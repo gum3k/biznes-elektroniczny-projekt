@@ -6,6 +6,9 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from time import sleep
 import random
 
 TIMEOUT = 10
@@ -18,6 +21,7 @@ class SeleniumImagoTester:
         self.options = Options()
         self.service = Service(executable_path=self.driver_path)
         self.driver = webdriver.Firefox(service=self.service, options=self.options)
+        self.actions = ActionChains(self.driver)
     
     def home_page(self):
         self.driver.get(self.base_url)
@@ -39,15 +43,20 @@ class SeleniumImagoTester:
         return WebDriverWait(self.driver, TIMEOUT).until(
             EC.presence_of_all_elements_located((By.XPATH, f"//*[contains(@class, 'js-product product') ]"))
         )
+    def wait_for_refresh(self, element):
+        WebDriverWait(self.driver, LONG_TIMEOUT).until(EC.staleness_of(element))
     def wait_for_reload(self, current_url):
         WebDriverWait(self.driver, LONG_TIMEOUT).until(EC.url_changes(current_url))
     def wait_for_responsive(self):
         self.wait_for_clickable((By.XPATH, f"//a[@href='https://localhost/index.php']"))
 
+    def scroll_to_click(self, element):
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
+        element.click()
 
     def click_by_anything(self, locator):
         element = self.wait_for_clickable(locator)
-        element.click()
+        self.scroll_to_click(element)
         return element
     def click_submit_button(self):
         element = self.click_by_anything((By.CSS_SELECTOR, 'button[type="submit"]'))
@@ -65,8 +74,9 @@ class SeleniumImagoTester:
         element = self.click_by_anything((By.CLASS_NAME, class_name))
         return element
     def click_element(self, locator):
-        self.wait_for_presence(locator)
-        self.driver.find_element(locator[0], locator[1]).click()
+        element = self.driver.find_element(locator[0], locator[1])
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
+        self.scroll_to_click(element)
         
 
     def register(self, gender: str, first_name: str, last_name: str, email: str, password: str, birthday: str):
@@ -76,9 +86,9 @@ class SeleniumImagoTester:
         self.wait_for_presence((By.ID, "customer-form"))
         
         if gender == "male":
-            self.driver.find_element(By.ID, "field-id_gender-1").click()
+            self.scroll_to_click(self.driver.find_element(By.ID, "field-id_gender-1"))
         elif gender == "female":
-            self.driver.find_element(By.ID, "field-id_gender-2").click()
+            self.scroll_to_click(self.driver.find_element(By.ID, "field-id_gender-2"))
         self.driver.find_element(By.ID, "field-firstname").send_keys(first_name)
         self.driver.find_element(By.ID, "field-lastname").send_keys(last_name)
         self.driver.find_element(By.ID, "field-email").send_keys(email)
@@ -86,7 +96,7 @@ class SeleniumImagoTester:
         self.driver.find_element(By.ID, "field-birthday").send_keys(birthday)
         self.click_element((By.NAME, "customer_privacy"))
         self.click_element((By.NAME, "psgdpr"))
-        # self.driver.find_element(By.NAME, "optin").click()
+        # self.scroll_to_click(self.driver.find_element(By.NAME, "optin"))
 
         current_url = self.driver.current_url
         self.click_submit_button()
@@ -109,7 +119,7 @@ class SeleniumImagoTester:
         search_box.clear()
         search_box.send_keys(product_name)
         current_url = self.driver.current_url
-        search_box.submit()
+        search_box.send_keys(Keys.ENTER)
         self.wait_for_reload(current_url)
         self.wait_for_presence_all((By.CLASS_NAME, 'product-miniature'))
 
@@ -128,7 +138,7 @@ class SeleniumImagoTester:
     
 
     def add_product_to_cart(self, product, product_quantity_min=1, product_quantity_max=1):
-        product.click()
+        self.scroll_to_click(product)
         self.choose_quantity(product_quantity_min=product_quantity_min, product_quantity_max=product_quantity_max)
         self.click_submit_button()
         self.click_by_anything((By.XPATH, '//div[@class="cart-content"]//button[@class="btn btn-secondary" and @data-dismiss="modal"]'))
@@ -141,15 +151,15 @@ class SeleniumImagoTester:
         valid_page_links = [link for link in page_links if link.text.strip().isdigit()]
         random_link = random.choice(valid_page_links)
         self.wait_for_clickable(random_link)
-        current_url = self.driver.current_url
-        random_link.click()
-        self.wait_for_reload(current_url)
+        self.scroll_to_click(random_link)
+        self.wait_for_refresh(random_link)
 
 
     
     def add_random_product_to_cart(self, product_quantity_min=1, product_quantity_max=1):
         products = []
         self.random_page()
+        products = self.get_available_products()
         while products == []:
             self.random_page()
             products = self.get_available_products()
@@ -223,7 +233,7 @@ class SeleniumImagoTester:
             if carrier_name_element and carrier_name_element.text.strip() == delivery_name:
                 radio_button = option.find_element(By.XPATH, './/input[@type="radio"]')
                 if not radio_button.is_selected():
-                    radio_button.click()
+                    self.scroll_to_click(radio_button)
                 break
         self.click_by_name("confirmDeliveryOption")
 
@@ -231,11 +241,11 @@ class SeleniumImagoTester:
     def select_payment(self, payment_method_name):
         self.wait_for_presence_all((By.CLASS_NAME, 'payment-option'))
         payment_radio_button = self.driver.find_element(By.CSS_SELECTOR, f"input[data-module-name='{payment_method_name}']")
-        payment_radio_button.click()
+        self.scroll_to_click(payment_radio_button)
 
         terms_checkbox = self.driver.find_element(By.ID, "conditions_to_approve[terms-and-conditions]")
         if not terms_checkbox.is_selected():
-            terms_checkbox.click()
+            self.scroll_to_click(terms_checkbox)
         current_url = self.driver.current_url
         self.click_by_anything((By.CSS_SELECTOR, ".btn.btn-primary.center-block"))
         self.wait_for_reload(current_url)
@@ -263,5 +273,4 @@ class SeleniumImagoTester:
 
 
     def quit_driver(self):
-        self.driver.close()
         self.driver.quit()
