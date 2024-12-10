@@ -11,8 +11,8 @@ def generate_unique_email(base_email: str) -> str:
 
 def slow_scroll_down(driver):
     actions = ActionChains(driver)
-    num_scrolls = 1000
-    scroll_distance = 1
+    num_scrolls = 500
+    scroll_distance = 2
     pause_time = 0.005
 
     for _ in range(num_scrolls):
@@ -21,21 +21,21 @@ def slow_scroll_down(driver):
 
 
 if __name__ == "__main__":
-    tester = SeleniumImagoTester(driver_path='geckodriver', base_url='https://localhost/index.php')
+    tester = SeleniumImagoTester(driver_path='/usr/bin/chromedriver', base_url='https://localhost/index.php')
 
     order_data = {
         "address": {
-            "alias": "Homo",
-            "first_name": "Sukmy",        
-            "last_name": "Deek",         
-            "company": "Hoe Enterprises",
-            "vat_number": "420",  
-            "address1": "123 Main St", 
+            "alias": "Address",
+            "first_name": "Jan",        
+            "last_name": "Rogowski",         
+            "company": "Intel",
+            "vat_number": "4204202137",  
+            "address1": "Rogowska 69", 
             "address2": "Apt 4B",    
-            "postcode": "01-234",       
+            "postcode": "69-420",       
             "city": "Utoya",            
             "country": "Polska",        
-            "phone": "69"       
+            "phone": "14886969"       
         },
         "delivery": "DHL",              # My carrier / InPost / DHL / Imago
         "payment": "ps_cashondelivery"  # ps_wirepayment / ps_cashondelivery / sumuppaymentgateway
@@ -45,13 +45,13 @@ if __name__ == "__main__":
     tester.home_page()
     tester.register(
         gender="male", 
-        first_name="Karol",
-        last_name="Wojtyła",
+        first_name="Jay",
+        last_name="Rog",
         email=generate_unique_email("julek.g@ej.com"),
         password="12345",
         birthday="2001-09-11"
     )
-    tester.search_product("ddddd")
+    tester.search_product("minecraft")
     tester.get_available_products()
     tester.add_random_product_to_cart(product_quantity_min=1, product_quantity_max=10)
     tester.add_products_to_cart(category="Geek domácnost", products_amount=5, product_quantity_min=1, product_quantity_max=10)

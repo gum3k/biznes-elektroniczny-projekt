@@ -1,6 +1,8 @@
 from selenium import webdriver
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.firefox.options import Options
+#from selenium.webdriver.firefox.service import Service
+#from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
@@ -19,8 +21,11 @@ class SeleniumImagoTester:
         self.driver_path = driver_path
         self.base_url = base_url
         self.options = Options()
+        self.options.add_argument('--ignore-certificate-errors')
+        self.options.add_argument('--ignore-ssl-errors')
+        self.options.add_argument('--disable-dev-shm-usage') 
         self.service = Service(executable_path=self.driver_path)
-        self.driver = webdriver.Firefox(service=self.service, options=self.options)
+        self.driver = webdriver.Chrome(service=self.service, options=self.options)
         self.actions = ActionChains(self.driver)
     
     def home_page(self):
@@ -270,7 +275,6 @@ class SeleniumImagoTester:
         self.click_by_link("https://localhost/index.php?controller=history")
         self.click_by_anything((By.XPATH, f"//a[contains(@href, 'https://localhost/index.php?controller=pdf-invoice')]"))
         
-
 
     def quit_driver(self):
         self.driver.quit()
