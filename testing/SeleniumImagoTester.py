@@ -1,8 +1,6 @@
 from selenium import webdriver
-#from selenium.webdriver.firefox.service import Service
-#from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
@@ -25,7 +23,7 @@ class SeleniumImagoTester:
         self.options.add_argument('--ignore-ssl-errors')
         self.options.add_argument('--disable-dev-shm-usage') 
         self.service = Service(executable_path=self.driver_path)
-        self.driver = webdriver.Chrome(service=self.service, options=self.options)
+        self.driver = webdriver.Firefox(service=self.service, options=self.options)
         self.actions = ActionChains(self.driver)
     
     def home_page(self):

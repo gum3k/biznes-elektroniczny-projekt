@@ -21,23 +21,23 @@ def slow_scroll_down(driver):
 
 
 if __name__ == "__main__":
-    tester = SeleniumImagoTester(driver_path='/usr/bin/chromedriver', base_url='https://localhost/index.php')
+    tester = SeleniumImagoTester(driver_path='/snap/bin/geckodriver', base_url='https://localhost/index.php')
 
     order_data = {
         "address": {
             "alias": "Address",
-            "first_name": "Jan",        
-            "last_name": "Rogowski",         
+            "first_name": "Jonathan",        
+            "last_name": "Hornhead",         
             "company": "Intel",
             "vat_number": "4204202137",  
-            "address1": "Rogowska 69", 
-            "address2": "Apt 4B",    
-            "postcode": "69-420",       
-            "city": "Utoya",            
+            "address1": "Biala 1A", 
+            "address2": "60",    
+            "postcode": "21-370",       
+            "city": "Choroszcz",            
             "country": "Polska",        
-            "phone": "14886969"       
+            "phone": "148869692"       
         },
-        "delivery": "DHL",              # My carrier / InPost / DHL / Imago
+        "delivery": "InPost",              # My carrier / InPost / DHL / Imago
         "payment": "ps_cashondelivery"  # ps_wirepayment / ps_cashondelivery / sumuppaymentgateway
     }
     
@@ -45,9 +45,9 @@ if __name__ == "__main__":
     tester.home_page()
     tester.register(
         gender="male", 
-        first_name="Jay",
-        last_name="Rog",
-        email=generate_unique_email("julek.g@ej.com"),
+        first_name="Johnny",
+        last_name="Horny",
+        email=generate_unique_email("julek.malpa@malpa.com"),
         password="12345",
         birthday="2001-09-11"
     )
