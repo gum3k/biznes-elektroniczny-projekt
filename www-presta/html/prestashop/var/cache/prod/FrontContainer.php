@@ -5523,6 +5523,8 @@ class FrontContainer extends \PrestaShop\PrestaShop\Adapter\Container\LegacyCont
                 62 => 'ps_emailalerts',
                 63 => 'ps_cashondelivery',
                 64 => 'sumuppaymentgateway',
+                65 => 'ps_newproducts',
+                66 => 'ps_brandlist',
             ],
             'ps_cache_dir' => '/var/www/html/prestashop/var/cache/prod/',
             'mail_themes_uri' => '/mails/themes',
