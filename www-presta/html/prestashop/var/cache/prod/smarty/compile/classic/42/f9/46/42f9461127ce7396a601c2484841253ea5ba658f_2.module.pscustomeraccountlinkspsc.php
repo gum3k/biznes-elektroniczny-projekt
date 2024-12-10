@@ -1,11 +1,11 @@
 <?php
-/* Smarty version 3.1.48, created on 2024-12-06 15:12:32
+/* Smarty version 3.1.48, created on 2024-12-10 19:14:25
   from 'module:pscustomeraccountlinkspsc' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.48',
-  'unifunc' => 'content_67530650313931_31893001',
+  'unifunc' => 'content_67588501c035b1_29983765',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_67530650313931_31893001 (Smarty_Internal_Template $_smarty_tpl) {
+function content_67588501c035b1_29983765 (Smarty_Internal_Template $_smarty_tpl) {
 ?>
 <div id="block_myaccount_infos" class="col-md-3 links wrapper">
   <p class="h3 myaccount-title hidden-sm-down">

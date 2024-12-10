@@ -1,11 +1,11 @@
 <?php
-/* Smarty version 3.1.48, created on 2024-11-30 21:41:17
+/* Smarty version 3.1.48, created on 2024-12-10 19:05:09
   from '/var/www/html/prestashop/admin9308dqo0o/themes/default/template/controllers/images/content.tpl' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.48',
-  'unifunc' => 'content_674b786d9b2f65_59115365',
+  'unifunc' => 'content_675882d5cd6059_87942674',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_674b786d9b2f65_59115365 (Smarty_Internal_Template $_smarty_tpl) {
+function content_675882d5cd6059_87942674 (Smarty_Internal_Template $_smarty_tpl) {
 ?>
 <div class="alert alert-danger">
 	<?php echo call_user_func_array( $_smarty_tpl->smarty->registered_plugins[Smarty::PLUGIN_FUNCTION]['l'][0], array( array('s'=>'By default, all images settings are already installed in your store. Do not delete them, you will need it!','d'=>'Admin.Design.Help'),$_smarty_tpl ) );?>

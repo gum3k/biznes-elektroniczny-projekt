@@ -1,11 +1,11 @@
 <?php
-/* Smarty version 3.1.48, created on 2024-12-06 14:33:00
+/* Smarty version 3.1.48, created on 2024-12-10 19:09:47
   from '/var/www/html/prestashop/modules/welcome/views/content.tpl' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.48',
-  'unifunc' => 'content_6752fd0c001506_42141561',
+  'unifunc' => 'content_675883eb51e3a4_71715545',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_6752fd0c001506_42141561 (Smarty_Internal_Template $_smarty_tpl) {
+function content_675883eb51e3a4_71715545 (Smarty_Internal_Template $_smarty_tpl) {
 $_smarty_tpl->_checkPlugins(array(0=>array('file'=>'/var/www/html/prestashop/vendor/smarty/smarty/libs/plugins/function.math.php','function'=>'smarty_function_math',),));
 ?>
 
