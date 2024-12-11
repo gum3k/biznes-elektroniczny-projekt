@@ -15,7 +15,7 @@ Project aimsto copy internet shop using [Prestashop 1.7.8](https://github.com/Pr
 The contents of the repository are divided into the following folders:
 1. **/skrypt-prestashop** -> source code of the prestashope script;
 2. **/www-presta/html** -> source code for the store;
-3. **/tests** -> source code for automated tests;
+3. **/testing** -> source code for automated tests;
 4. **/scraper** -> source code for the scraping tool;
 5. **/scraper/imago-products** -> results of the scraping;
 
@@ -25,8 +25,8 @@ The contents of the repository are divided into the following folders:
 - [Selenium](https://www.selenium.dev/documentation/)
 
 ## Team
-- Juliusz Radziszewski
-- Adrian Szwaczyk
-- Hubert Zedlewski
-- Jakub Gumkowski
-- Maciej Żuralski
+- Juliusz Radziszewski - Prestashop configuration and Presta API
+- Adrian Szwaczyk - Testing
+- Hubert Zedlewski - Prestashop configuration and frontend
+- Jakub Gumkowski - Prestashop configuration and Presta API
+- Maciej Żuralski - Scraper
