@@ -1,0 +1,46 @@
+
+services:
+  prestashop:
+    image: gum3kkk/presta
+    ports:
+      - "19303:443"
+    environment:
+      DB_SERVER: admin-mysql_db
+      DB_NAME: BE_193036
+      DB_USER: root
+      DB_PASSWORD: student
+      PS_DOMAIN: localhost:19303
+      RESTORE_DB: "true"
+      MAIL_USER: adrian@confi.com
+      MAIL_PASSWORD: password
+      DEV_MODE: "false"
+      USE_DB_DUMP: 1
+      PS_DEV_MODE: 0
+    networks:
+      - admin-mysql_default
+      - BE_193036
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 512M
+  memcached:
+    image: memcached
+    command:
+      - --conn-limit=1024
+      - --memory-limit=64
+      - --threads=4
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+    networks:
+    - BE_193036
+networks:
+  admin-mysql_default:
+    external: true
+  BE_193036:
